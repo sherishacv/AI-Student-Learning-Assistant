@@ -1,0 +1,26 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Uploaded PDFs
+data/uploads/
+
+# Generated vector database
+vector_store/
+
+# Logs
+logs/
+
+# Test cache
+.pytest_cache/
+
+# VS Code
+.vscode/
+
+# OS files
+Thumbs.db
+.DS_Store
