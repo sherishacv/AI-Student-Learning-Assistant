@@ -1,0 +1,21 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Context}
+Students commonly study from course notes, textbooks, and lecture documents whose content is specific to a course or instructor. A general-purpose language model may answer outside that local material, while manual search through long documents can interrupt study. Retrieval-augmented generation (RAG) is a software pattern in which relevant passages are retrieved from a knowledge collection and supplied to a language model when responding. The foundational RAG formulation combines parametric generation with non-parametric retrieved memory \citep{lewis2020rag}.
+
+The project applies this pattern to PDF-based study material. A student uploads documents, selects a learning task, and submits a topic or question. The implementation extracts text, divides it into chunks, embeds those chunks for semantic search, ranks candidates using dense and lexical signals, and passes the selected context to one task-oriented response function.
+
+\section{Project overview}
+The repository implements a local Streamlit application in Python. Its runtime is assembled from a user interface, a RAG pipeline, a compiled LangGraph state graph, task-specific agents and prompt builders, a Groq model adapter, and shared utility functions. LangGraph is used as explicit state-and-control-flow orchestration rather than as evidence of multiple autonomous model loops \citep{langgraphdocs}.
+
+The application's visible task choices in \texttt{app.py} are Explain Topic, Generate Quiz, Generate Flashcards, Generate Summary, Study Planner, and Chat. Six agent functions are defined in the source, including a doubt solver. The distinction between implemented agent code and choices that can be selected in the interface is discussed in Chapter~\ref{ch:implementation}.
+
+\section{Motivation and significance}
+The project addresses a practical software problem: making a user's own study documents searchable through natural-language requests and adapting the requested response format to study activities. Its educational value is a design intention, not a measured outcome. No user evaluation, comparison with a baseline, or learning assessment is included in the repository.
+
+\section{Scope}
+This report covers source files, configuration, dependencies, tests, and the README found in the inspected repository. The active application path handles text-based PDF extraction, local embedding and FAISS persistence, retrieval, model invocation through Groq, and Streamlit presentation. It does not claim OCR support, multi-user access control, a hosted deployment, or a tested end-to-end educational intervention.
+
+\section{Report organization}
+Chapter~\ref{ch:background} introduces the technologies and concepts evidenced by the implementation. Chapters~\ref{ch:problem}--\ref{ch:methodology} define the problem, requirements, architecture, and algorithmic method. Chapters~\ref{ch:implementation}--\ref{ch:testing} document the application and available verification. Chapters~\ref{ch:results}--\ref{ch:limitations} discuss evidence, security and ethics, and remaining gaps. Chapter~\ref{ch:conclusion} closes the report; appendices provide setup, configuration, a results-record template, and a source map.

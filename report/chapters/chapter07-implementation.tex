@@ -1,0 +1,28 @@
+\chapter{Implementation}
+\label{ch:implementation}
+
+\section{Application lifecycle}
+The entry point is \texttt{app.py}. At import time it configures logging and ensures configured data, upload, vector-store, log, report, and test directories exist. The graph and RAG pipeline are each constructed by a function decorated with \texttt{st.cache\_resource}. Streamlit session state holds a list of question-answer pairs for the current interaction session.
+
+\section{Document indexing behavior}
+When the user selects \textit{Index PDFs}, the app loops over uploaded files and calls \texttt{RAGPipeline.index\_pdf}. That method clears the vector store before it loads and indexes the current file. Consequently, when multiple files are selected and indexed in one button operation, each subsequent file replaces the earlier file's vectors; after successful completion, only the last successfully indexed file remains in the index. This is the behavior of the current source, not a multi-document collection feature.
+
+\section{Intent routing and agent set}
+The interface converts its selected task label into a lower-case underscore-separated intent. The graph router checks for the substrings \texttt{quiz}, \texttt{flashcard}, \texttt{summary}, and \texttt{planner}; otherwise it selects the doubt solver only if the \emph{intent string} contains \texttt{doubt}, \texttt{why}, or \texttt{how}; all other cases select the teacher agent.
+
+The UI choices include Chat and Explain Topic but not Doubt Solver. The natural-language question text is not consulted by \texttt{route\_query}; therefore, selecting Chat or Explain Topic routes to the teacher agent, and writing a question beginning with ``why'' does not by itself select the doubt solver. The doubt-solving agent is implemented but is not directly reachable through the current UI task list.
+
+\section{Conversation history}
+The question-answer history is retained in Streamlit session state and displayed below each response. The app also places that history in the graph state, but the task agents construct prompts from the current question and retrieved context only. Earlier turns are therefore shown in the interface but are not supplied as conversational context to the model.
+
+\section{Task-oriented agents}
+Six agent functions share a common structure: read retrieved document content, join it into context, call a task-specific prompt function, invoke \texttt{GroqChatModel}, sanitize the generated output, compute the same confidence heuristic, and set the selected-agent field. Prompt templates specify different output structures for explanation, doubt resolution, quiz, summary, planner, and flashcards. For example, the quiz prompt requests ten multiple-choice questions and the flashcard prompt requests ten cards. Those are model instructions, not guarantees that provider output will comply.
+
+\section{Model adapter and failure behavior}
+The wrapper defaults to \texttt{llama-3.3-70b-versatile} unless \texttt{GROQ\_MODEL} overrides it. The API key is read from the environment. If the optional integration cannot be imported or the key is absent, the wrapper returns a readable unavailability message; invocation exceptions are logged and converted to an error string. These fallback strings are displayed through the same response path and are not raised as application exceptions.
+
+\section{Presentation and citations}
+The interface renders the response as Markdown and displays a rounded elapsed time, source names, pages, and retrieved-block relevance. The citation preview formats source filename, page number, and optional section inferred from text. These are provenance hints derived from PDF metadata; they are not external citations or a bibliography.
+
+\section{Logging and configuration}
+Configuration is loaded from a repository-local \texttt{.env} file using \texttt{python-dotenv}, with process-environment values also available. Defaults include model name, embedding model, chunk size and overlap, top-$k$, and hybrid weight. The logger writes to \texttt{logs/application.log} and to the stream. The actual dependency declaration uses \texttt{pypdf}, although the repository README's technology table names PyMuPDF; the code and dependency file are the authoritative evidence for the active implementation.

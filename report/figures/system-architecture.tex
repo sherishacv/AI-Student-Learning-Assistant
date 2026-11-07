@@ -1,0 +1,36 @@
+\begin{tikzpicture}[
+  node distance=8mm and 11mm,
+  block/.style={draw,rounded corners,align=center,text width=3.3cm,minimum height=0.8cm,font=\small},
+  store/.style={draw,cylinder,shape border rotate=90,aspect=0.25,align=center,text width=2.8cm,minimum height=1.0cm,font=\small},
+  flow/.style={-{Stealth[length=2.2mm]},thick},
+  node distance=8mm
+]
+\node[block] (student) {Student};
+\node[block,below=of student] (ui) {Streamlit interface\\upload, task, question, answer};
+\node[block,below left=13mm and 17mm of ui] (pdf) {Uploaded PDF};
+\node[block,below=of pdf] (extract) {Page text extraction\\pypdf};
+\node[block,below=of extract] (split) {Word-based splitter\\overlapping chunks};
+\node[block,below=of split] (embed) {Sentence Transformer\\normalized vectors};
+\node[store,below=of embed] (index) {FAISS L2 index\\and metadata};
+\node[block,below right=13mm and 17mm of ui] (query) {Question and selected intent};
+\node[block,below=of query] (retrieve) {Hybrid retrieval\\dense + keyword scoring};
+\node[block,below=of retrieve] (router) {LangGraph router};
+\node[block,below=of router] (agents) {Teacher, quiz, flashcard, summary, planner, doubt agents};
+\node[block,below=of agents] (llm) {Groq chat-model wrapper\\when credentials are configured};
+\node[block,below=of llm] (response) {Response and source metadata};
+
+\draw[flow] (student) -- (ui);
+\draw[flow] (ui) -- (pdf);
+\draw[flow] (pdf) -- (extract);
+\draw[flow] (extract) -- (split);
+\draw[flow] (split) -- (embed);
+\draw[flow] (embed) -- (index);
+\draw[flow] (ui) -- (query);
+\draw[flow] (query) -- (retrieve);
+\draw[flow] (index.east) -- ++(8mm,0) |- (retrieve.west);
+\draw[flow] (retrieve) -- (router);
+\draw[flow] (router) -- (agents);
+\draw[flow] (agents) -- (llm);
+\draw[flow] (llm) -- (response);
+\draw[flow] (response.west) -| (ui.south);
+\end{tikzpicture}

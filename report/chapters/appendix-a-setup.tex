@@ -1,0 +1,17 @@
+\chapter{Reproduction and Setup}
+\label{app:setup}
+
+\section{Environment preparation}
+The repository README describes cloning the GitHub project, creating a Python virtual environment, installing the declared dependencies, creating a local \texttt{.env}, and launching Streamlit. The repository does not pin a Python release or dependency lockfile. Use the exact source checkout and record the Python and dependency versions used for any reproducible evaluation.
+
+\section{Launch sequence}
+\begin{enumerate}
+  \item Create and activate a Python virtual environment appropriate for the operating system.
+  \item Install the packages listed in the repository's \texttt{requirements.txt}.
+  \item Copy \texttt{.env.example} to \texttt{.env} and configure a valid \texttt{GROQ\_API\_KEY} if live generation is required.
+  \item Run \texttt{streamlit run app.py} from the project root.
+  \item Upload a text-based PDF, select a task, submit a question, and inspect the answer and source/page display.
+\end{enumerate}
+
+\section{Reproducibility caveats}
+Indexing uses local files and model downloads; live responses depend on a remote provider. The project does not define a deterministic model seed, pin exact package versions, include a sample PDF, or supply expected generated answers. Tests should mock external services when repeatability is required.

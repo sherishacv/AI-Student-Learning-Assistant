@@ -1,0 +1,29 @@
+\chapter{Limitations and Future Work}
+\label{ch:limitations}
+
+\section{Functional limitations}
+\begin{itemize}
+  \item \textbf{Index replacement:} \texttt{index\_pdf} clears the existing index for every file, so a sequence of uploads does not create a combined knowledge base.
+  \item \textbf{Task routing mismatch:} the UI has no doubt-solving option, and the router sees the selected intent rather than the natural-language question.
+  \item \textbf{Text-only PDF path:} there is no OCR stage for scanned pages; empty extraction results are skipped.
+  \item \textbf{Persistence model:} the index is a local flat index with pickle metadata, without multi-user isolation, backup, or lifecycle management.
+  \item \textbf{Prompt compliance:} desired formats and grounding rules are instructions to the LLM, not enforced output schemas.
+\end{itemize}
+
+\section{Retrieval and evaluation limitations}
+The splitter uses words rather than model tokens and has no explicit validation of chunk-size/overlap consistency. The lexical term-count score can exceed one. The ranking weights and source/page bonuses have no documented tuning evidence. The confidence number is not empirically calibrated. The test suite is too small to characterize the full retrieval and generation pipeline, and no controlled evaluation results are included.
+
+\section{Repository consistency}
+The README names PyMuPDF, while the active implementation imports \texttt{pypdf} and \texttt{requirements.txt} declares \texttt{pypdf}. In addition, the repository contains alternate RAG modules (\texttt{chunker.py}, \texttt{pdf\_loader.py}, and \texttt{retriever.py}) that are not imported by the active pipeline and import \texttt{configure\_logging} from \texttt{config.py}; that function is not defined there. These files should be reconciled or removed in a future maintenance change. They are not represented as active components in the architecture figures.
+
+\section{Prioritized future work}
+\begin{enumerate}
+  \item Preserve an existing index when adding a PDF, or expose an explicit replace/append collection choice; add a regression test for multiple files.
+  \item Align the UI task options with router capabilities and test each route, including the intended behavior for Chat and doubt solving.
+  \item Validate chunk parameters, normalize lexical scores, and compare ranking configurations against a labeled retrieval set.
+  \item Add OCR as an optional documented path for scanned documents and test its page-level provenance.
+  \item Add mocked end-to-end tests for retrieval, graph state, model fallbacks, and citations.
+  \item Replace heuristic confidence presentation with a clearly labeled retrieval score or a separately calibrated confidence method.
+  \item Define privacy, retention, access-control, and safe file-handling requirements before deployment.
+  \item Reconcile the duplicate RAG modules and update README package descriptions to match the active dependency set.
+\end{enumerate}

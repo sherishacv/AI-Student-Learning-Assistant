@@ -1,0 +1,25 @@
+\chapter{Problem Definition and Objectives}
+\label{ch:problem}
+
+\section{Problem statement}
+The project targets the effort required to locate relevant content in a student's own PDF study material and restate that content in formats useful for revision. The software problem is to connect document ingestion, query-time retrieval, task selection, model prompting, and display while retaining basic source and page metadata.
+
+\section{Objectives}
+\begin{enumerate}
+  \item Accept PDF study files through a browser-based interface.
+  \item Extract page text and preserve source and page identifiers for chunks.
+  \item Build an embedding index and return relevant context for a query.
+  \item Combine semantic and lexical evidence in a configurable ranking stage.
+  \item Route the selected task to a matching prompt and agent function.
+  \item Present an answer together with retrieval-source details and simple runtime indicators.
+\end{enumerate}
+These objectives describe intended software behavior. The available tests do not establish that all objectives pass end-to-end.
+
+\section{Inputs and outputs}
+Inputs consist of PDF files and a text request selected from a UI task mode. The primary output is Markdown-like model text. The application also exposes a confidence heuristic, elapsed query time, source names, page values, relevance values, and a citation preview based on retrieved metadata. It does not produce a formally formatted bibliographic citation for the source PDFs.
+
+\section{Assumptions and boundaries}
+The ingestion path assumes a PDF from which \texttt{pypdf} can extract text. It assumes the embedding model can be loaded in the local environment and that vector dimensions match the configured index dimension. Live generation assumes a usable Groq API key. There is no project evidence that scanned documents, malformed files, concurrent users, or large-scale collections have been evaluated.
+
+\section{Success criteria and evidence}
+The source establishes the intended flow and two small unit-level assertions. It does not define measurable acceptance thresholds for retrieval relevance, answer correctness, response latency, or learning benefit. Such criteria should be defined before a formal evaluation; a data-record template is provided in Appendix~\ref{app:evaluation}.

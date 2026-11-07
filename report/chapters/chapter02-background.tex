@@ -1,0 +1,23 @@
+\chapter{Background and Related Concepts}
+\label{ch:background}
+
+\section{Retrieval-augmented generation}
+RAG combines retrieval of external context with language-model generation. In this application, the external collection is composed of chunks extracted from uploaded PDFs, and the retrieved text is inserted into a task-specific prompt. The source code instructs the model to treat that material as reference and to avoid answering when it is insufficient. This is a prompt-level design; it does not prove that every generated statement is grounded or that unsupported content is impossible.
+
+\section{PDF text extraction}
+The active extraction helper uses \texttt{pypdf.PdfReader}, iterates pages starting at page 1, calls \texttt{extract\_text()}, and omits pages whose extracted text is empty. The \texttt{pypdf} documentation describes extraction as parsing page content streams and notes that image-only pages may not yield usable text \citep{pypdfdocs}. The repository does not implement an OCR stage.
+
+\section{Embedding-based retrieval}
+The configured model name is \texttt{sentence-transformers/all-MiniLM-L6-v2}. Its model card describes a 384-dimensional dense vector representation used for tasks including semantic search \citep{minilmcard}. The code requests normalized embeddings and converts them to NumPy \texttt{float32}. These embeddings provide a semantic representation for indexed chunks and queries.
+
+\section{FAISS vector search}
+FAISS provides data structures and operations for vector similarity search \citep{faissdocs}. The project creates \texttt{faiss.IndexFlatL2} with a configured dimension of 384, adds vectors, and requests nearest neighbors using the L2 index. This is an exact flat index implementation in the code; no approximate index or external vector database is configured.
+
+\section{Hybrid retrieval}
+The active retriever combines a dense-distance-derived score with a lightweight keyword-overlap score. This hybrid design can use semantic similarity and exact term matches as complementary signals. In this implementation, it is a custom ranking procedure over an in-process FAISS index and Python metadata, not a separately deployed search service.
+
+\section{Workflow orchestration and user interface}
+LangGraph represents workflows using shared state, nodes, and edges; its documentation presents the framework as a low-level orchestration runtime \citep{langgraphdocs}. Here, a router node selects one of six agent nodes, each of which calls its own prompt builder and writes a response into the shared state. Streamlit reruns scripts in response to interactions and provides resource caching and session state; the project uses \texttt{st.cache\_resource} for its graph and RAG pipeline and \texttt{st.session\_state} for conversation history \citep{streamlitcache}.
+
+\section{Model-provider integration}
+The model wrapper lazily constructs LangChain's \texttt{ChatGroq} integration using the configured model name and API key, then invokes it with a prompt string. The provider integration is documented by LangChain \citep{chatgroqdocs}. Actual successful model access depends on a valid credential, provider availability, and model availability; the repository contains no recorded provider response or integration test.

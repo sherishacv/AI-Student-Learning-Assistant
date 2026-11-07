@@ -1,0 +1,28 @@
+\chapter{Evaluation Record Template}
+\label{app:evaluation}
+
+This blank record is provided to support future measurement. Complete it only with observations from an actual run; do not treat the placeholders as results.
+
+\begin{table}[htbp]
+\centering
+\caption{Per-query evaluation record}
+\label{tab:evaluation-record}
+\begin{tabularx}{\textwidth}{p{0.33\textwidth}Y}
+\toprule
+\textbf{Field} & \textbf{Value to record}\\
+\midrule
+Experiment identifier & \placeholder{Unique run ID}\\
+Date, environment, package versions & \placeholder{Record actual values}\\
+Document identifier and page count & \placeholder{Record actual values; do not include sensitive content}\\
+Query and selected UI task & \placeholder{Record exact test input}\\
+Expected relevant pages / answer criteria & \placeholder{Prepare before running the system}\\
+Retrieved sources and pages & \placeholder{Copy from the actual application output}\\
+Observed response and correctness judgment & \placeholder{Use a documented rating rubric}\\
+Displayed confidence and elapsed time & \placeholder{Record actual UI values}\\
+Evaluator and notes & \placeholder{Record actual evaluator and caveats}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section*{Suggested aggregate metrics}
+For a retrieval test set with relevance labels, report an explicitly defined measure such as Precision@\(k\), Recall@\(k\), or mean reciprocal rank, with the query count and labeling procedure. For generated answers, use a documented human rubric for correctness and support in retrieved passages. Report latency distributions over a stated workload rather than a single request. No metric values are supplied in this report because the project repository contains no such evaluation data.

@@ -1,0 +1,30 @@
+\chapter{Results and Discussion}
+\label{ch:results}
+
+\section{Implemented artifacts}
+Source inspection confirms the existence of the PDF upload and indexing interface, configurable ingestion and retrieval components, a FAISS-backed vector store, a LangGraph router with six agent nodes, task-specific prompts, a Groq model wrapper, response display, and two small tests. The default configuration values and UI output fields are documented in Chapters~\ref{ch:requirements} and~\ref{ch:methodology}.
+
+\section{Measured results}
+No empirical result table, dataset, annotated relevance set, model-output corpus, user study, or benchmark script is included in the repository. Thus, there are no supported values for precision, recall, hit rate, answer faithfulness, quiz quality, learning gain, or performance targets. The UI computes elapsed response time and a retrieval-derived confidence heuristic at runtime, but neither is a recorded experimental result.
+
+\begin{table}[htbp]
+\centering
+\caption{Evidence available and unavailable for evaluation}
+\label{tab:evidence}
+\begin{tabularx}{\textwidth}{p{0.38\textwidth}Y}
+\toprule
+\textbf{Measure / evidence} & \textbf{Status in inspected repository}\\
+\midrule
+Source-level architecture and configured defaults & Present in source files.\\
+Splitter smoke test and sanitizer test & Present as two pytest test functions; execution unavailable because pytest is not installed in the workspace.\\
+Retrieval relevance metrics & Not present.\\
+Generation correctness or groundedness evaluation & Not present.\\
+Latency or throughput benchmark & Not present; only a per-request UI timer is implemented.\\
+Student usability or learning-outcome evaluation & Not present.\\
+Compiled report PDF & Not generated; no TeX compiler found.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Interpretation}
+The implementation provides a coherent prototype path from document text to task-shaped responses, but the code alone cannot establish that retrieval is relevant, that model outputs obey their prompts, or that students learn more effectively. The index-clearing behavior also narrows the effective document collection when several PDFs are selected. Accordingly, this chapter reports implementation evidence rather than claiming experimental success.

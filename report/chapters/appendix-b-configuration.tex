@@ -1,0 +1,24 @@
+\chapter{Configuration Reference}
+\label{app:configuration}
+
+\begin{longtable}{p{0.27\textwidth}p{0.27\textwidth}p{0.34\textwidth}}
+\caption{Environment variables in the example configuration}\label{tab:configuration}\\
+\toprule
+\textbf{Variable} & \textbf{Default / example} & \textbf{Meaning}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Variable} & \textbf{Default / example} & \textbf{Meaning}\\
+\midrule
+\endhead
+\texttt{GROQ\_API\_KEY} & \placeholder{Set a private key} & Enables live model invocation.\\
+\texttt{GROQ\_MODEL} & \texttt{llama-3.3-70b-versatile} & Model name passed to the Groq chat integration.\\
+\texttt{EMBEDDING\_MODEL} & \texttt{sentence-transformers/all-MiniLM-L6-v2} & Sentence Transformer identifier.\\
+\texttt{CHUNK\_SIZE} & 1200 & Word count per chunk in the active splitter.\\
+\texttt{CHUNK\_OVERLAP} & 200 & Overlapping words between adjacent chunks.\\
+\texttt{TOP\_K} & 5 & Number of merged retrieval blocks returned by default.\\
+\texttt{HYBRID\_ALPHA} & 0.75 & Dense score weight in the hybrid score.\\
+\bottomrule
+\end{longtable}
+
+The configured embedding dimension is 384 in \texttt{config.py}; it is not exposed as an environment variable. The active splitter counts whitespace-separated words even though the settings are described generally as chunk size and overlap.

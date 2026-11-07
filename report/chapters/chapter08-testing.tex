@@ -1,0 +1,19 @@
+\chapter{Testing and Verification}
+\label{ch:testing}
+
+\section{Tests present in the repository}
+The repository contains one test module, \texttt{tests/test\_rag.py}, with two test functions:
+\begin{enumerate}
+  \item A splitter smoke test supplies one page of text and asserts that at least one chunk is returned.
+  \item A response-sanitization test asserts that two prompt-like phrases are removed while a subsequent answer phrase remains.
+\end{enumerate}
+These tests do not exercise PDF parsing, embedding generation, vector persistence, hybrid ranking, LangGraph routing, Groq access, Streamlit interaction, multiple-file indexing, or end-to-end answer grounding.
+
+\section{Validation performed for this report}
+The available workspace has Python 3.13.2, but \texttt{pytest} is not installed; therefore the existing pytest suite could not be executed in this environment. No \texttt{pdflatex}, \texttt{latexmk}, \texttt{xelatex}, or \texttt{lualatex} executable was found. A compiled PDF could not be generated here. These are environment limitations, not evidence that the source tests or LaTeX report pass under a configured toolchain.
+
+\section{Recommended verification plan}
+Before release, the project should add unit tests for chunk boundaries and invalid parameters, page/source metadata, dense and lexical score behavior, deduplication and grouping, index save/load, and router selection. Integration tests should mock the embedding model and Groq client to cover graph invocation without network dependence. An application-level test should index multiple PDFs and assert the intended collection behavior. A separate evaluation should use a documented set of query-document relevance judgments and answer-grounding checks.
+
+\section{LaTeX build verification}
+The report is structured for Overleaf and XeLaTeX or LuaLaTeX. The main file includes package-level font fallback and uses ordinary BibTeX/natbib citations. Since a TeX engine is not available in the workspace, page layout, bibliography compilation, and figure rendering remain to be checked by compiling \texttt{main.tex} in Overleaf or another full LaTeX environment. Appendix~\ref{app:source-map} lists the report files for upload.

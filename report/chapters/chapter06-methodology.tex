@@ -1,0 +1,55 @@
+\chapter{Methodology and Algorithms}
+\label{ch:methodology}
+
+\section{Document ingestion}
+For an uploaded file, the interface saves the bytes under \texttt{data/uploads/<filename>}. \texttt{PDFLoader} delegates to \texttt{extract\_pdf\_text}, which extracts each page independently and retains non-empty text with its source path and one-based page number. The pipeline then splits page text, embeds all resulting chunks, adds vectors and metadata to the FAISS index, and saves index state.
+
+\section{Word-based chunking}
+The active \texttt{RecursiveTextSplitter} tokenizes using Python's whitespace-based \texttt{split()}, rather than a model tokenizer or a character count. With defaults \(C=1200\) words and overlap \(O=200\) words, chunk \(j\) covers a word interval \([s_j,e_j)\), where the next start is \(s_{j+1}=e_j-O\) until the page is exhausted. Each chunk preserves source, page, and a generated chunk identifier. The configuration is adjustable through \texttt{CHUNK\_SIZE} and \texttt{CHUNK\_OVERLAP}.
+
+\section{Dense vector representation}
+Each chunk and query is encoded by the configured Sentence Transformer. The code calls \texttt{encode(..., normalize\_embeddings=True, convert\_to\_numpy=True)} and converts output to \texttt{float32}. The configured embedding dimension and FAISS index dimension are both 384. The code does not perform dimension discovery from the loaded model; therefore a model override must remain dimension-compatible.
+
+\section{Hybrid candidate scoring}
+The retriever asks FAISS for up to \(\max(3k,10)\) dense candidates, where \(k\) is the requested result count. For a returned L2 distance \(D(c,q)\), it derives a dense score:
+\begin{equation}
+S_{\mathrm{dense}}(c,q)=\frac{1}{1+\max(D(c,q),10^{-9})}.
+\label{eq:dense-score}
+\end{equation}
+The lexical score counts query-term occurrences in a chunk and divides by the number of unique query terms:
+\begin{equation}
+S_{\mathrm{lex}}(c,q)=
+\frac{\sum_{t\in T_q} f(t,c)}{\max(1,\lvert T_q\rvert)},
+\label{eq:lexical-score}
+\end{equation}
+where \(T_q\) is the set of lower-cased word-like query terms and \(f(t,c)\) is their count in the chunk. Because occurrence counts are summed, the lexical score is not necessarily bounded by one.
+
+The agreement term is a capped weighted fraction of dense candidates sharing the same source and page:
+\begin{equation}
+A(c)=\min\left(1,\;0.6\frac{n_s}{N}+0.4\frac{n_p}{N}\right),
+\label{eq:agreement}
+\end{equation}
+where \(N\) is the number of dense results, \(n_s\) counts same-source results, and \(n_p\) counts same-page results. The initial combined score is:
+\begin{equation}
+S_0(c,q)=\alpha S_{\mathrm{dense}}(c,q)
++(1-\alpha)S_{\mathrm{lex}}(c,q)+0.05A(c).
+\label{eq:hybrid-score}
+\end{equation}
+The default \(\alpha\) is 0.75. The implementation adds a source bonus of 0.06 for candidates from the source of the highest-scored candidate and a page bonus of \(0.04/(1+\Delta p)\), where \(\Delta p\) is the page distance from that reference candidate. Remaining metadata chunks are also considered with a lexical-only score. These constants are implementation heuristics; the repository provides no calibration or empirical justification for them.
+
+\section{Context grouping and selection}
+Ranked chunks are deduplicated by chunk ID, grouped when they share a source and have a page gap of at most one, and concatenated into context blocks. Each merged block is truncated to 2500 characters. Its displayed relevance, semantic, lexical, and agreement values are averages over its constituent entries. The resulting blocks are sorted and limited to \(k\). The summary branch calls the same merge function; it does not implement a distinct summary-ranking algorithm.
+
+\section{Confidence heuristic}
+For each retrieved document, the implementation computes a weighted sum:
+\begin{equation}
+C_i=0.35S_{\mathrm{semantic},i}
++0.25S_{\mathrm{keyword},i}
++0.20S_{\mathrm{agreement},i}
++0.20S_{\mathrm{relevance},i}.
+\label{eq:confidence-item}
+\end{equation}
+It averages the document values, clamps the result to \([0,1]\), and rounds to two decimal places. This number is presented as a confidence score, but is not calibrated against answer correctness and should be interpreted only as a retrieval-derived heuristic.
+
+\section{Answer generation}
+Each active agent builds a prompt containing a shared security instruction, task-specific output requirements, user question, and retrieved context. Empty context produces a fixed no-material response without calling the model. Otherwise, a Groq chat wrapper invokes the configured model. The answer is passed through a phrase-removal sanitizer before storage in graph state. The prompts request material-grounded answers, but the code does not apply a formal entailment check to the final answer.

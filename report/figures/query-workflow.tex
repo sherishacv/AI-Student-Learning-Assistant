@@ -1,0 +1,22 @@
+\begin{tikzpicture}[
+  node distance=8mm and 10mm,
+  block/.style={draw,rounded corners,align=center,text width=3.0cm,minimum height=0.85cm,font=\small},
+  flow/.style={-{Stealth[length=2.2mm]},thick}
+]
+\node[block] (input) {User question\\and selected task};
+\node[block,right=of input] (retrieve) {RAG retrieval\\top-$k$ context blocks};
+\node[block,right=of retrieve] (route) {Intent router\\select one agent};
+\node[block,right=of route] (prompt) {Task prompt\\question + context};
+\node[block,below=of prompt] (model) {Groq chat model\\or fallback message};
+\node[block,left=of model] (clean) {Sanitize response\\compute heuristic confidence};
+\node[block,left=of clean] (display) {Streamlit display\\answer + sources + timing};
+\node[block,below=of retrieve] (index) {FAISS vectors\\and chunk metadata};
+
+\draw[flow] (input) -- (retrieve);
+\draw[flow] (index) -- (retrieve);
+\draw[flow] (retrieve) -- (route);
+\draw[flow] (route) -- (prompt);
+\draw[flow] (prompt) -- (model);
+\draw[flow] (model) -- (clean);
+\draw[flow] (clean) -- (display);
+\end{tikzpicture}

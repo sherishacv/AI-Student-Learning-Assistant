@@ -1,0 +1,48 @@
+\chapter{System Design}
+\label{ch:design}
+
+\section{Architectural overview}
+Figure~\ref{fig:architecture} shows the two major flows. PDF ingestion creates a local vector index and metadata collection; query handling retrieves context, routes the task, calls the selected agent, and displays the response. The diagram reflects the active imports and calls in \texttt{app.py}, \texttt{src/rag/rag\_pipeline.py}, and \texttt{src/graph/graph\_builder.py}.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.98\textwidth}{!}{\input{figures/system-architecture}}
+\caption{Source-backed system architecture of the application}
+\label{fig:architecture}
+\end{figure}
+
+\section{Component responsibilities}
+\begin{table}[htbp]
+\centering
+\caption{Main runtime components}
+\label{tab:components}
+\begin{tabularx}{\textwidth}{p{0.27\textwidth}Y}
+\toprule
+\textbf{Component} & \textbf{Responsibility}\\
+\midrule
+\texttt{app.py} & Streamlit controls, uploaded-file persistence, task selection, query orchestration, and answer display.\\
+\texttt{config.py} & Environment-backed defaults, filesystem paths, and directory creation.\\
+\texttt{src/rag} active path & PDF text loading, splitting, embedding, FAISS persistence, hybrid retrieval, and RAG coordination.\\
+\texttt{src/graph} & Shared state schema, intent router, agent nodes, and graph compilation.\\
+\texttt{src/agents} and \texttt{src/prompts} & Task-specific prompt construction, model invocation, response sanitization, and confidence assignment.\\
+\texttt{src/models/llm.py} & Lazy Groq chat-model adapter and user-readable fallback strings.\\
+\texttt{src/utils} & Source formatting, prompt instruction, response sanitization, confidence heuristic, PDF extraction, and logging.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Data and control flow}
+The compiled graph contains a router node and six terminal agent nodes. The router selects one node from the value returned by \texttt{route\_query}; each task agent consumes the retrieved documents, assembles their text as prompt context, invokes a model wrapper when context is non-empty, and updates the shared state. Figure~\ref{fig:query-workflow} summarizes query-time execution.
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.98\textwidth}{!}{\input{figures/query-workflow}}
+\caption{Query-time workflow from user input to displayed answer}
+\label{fig:query-workflow}
+\end{figure}
+
+\section{State model}
+The \texttt{AgentState} TypedDict declares optional fields for the question, retrieved documents, intent, selected agent, response, sources, pages, chat history, confidence, routing label, response time, and retrieved chunk text. At runtime, \texttt{app.py} constructs this state before calling \texttt{graph.invoke}. The agent functions mutate and return the supplied dictionary; no external checkpoint store is configured.
+
+\section{Persistence design}
+The configured vector index path is \texttt{vector\_store/faiss.index}; metadata is stored in \texttt{vector\_store/metadata.pkl}. Uploaded PDFs are written to \texttt{data/uploads}. Both paths are ignored by Git, as are logs. The application's conversation history is held in Streamlit session state rather than a durable database.

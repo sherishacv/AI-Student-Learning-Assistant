@@ -1,0 +1,8 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+This report documented the AI Student Learning Assistant as it exists in the inspected repository. The application connects PDF text extraction and word-based chunking to normalized sentence embeddings, a local FAISS L2 index, custom hybrid retrieval, a LangGraph router, task-specific prompts, a Groq model wrapper, and a Streamlit user interface. The source also exposes source/page metadata, a retrieval-derived confidence heuristic, and a query timer.
+
+The project demonstrates a useful integration of document search and task-oriented generation, but the available evidence is limited to implementation and two narrow tests. Multiple-file indexing currently replaces the prior index, the doubt-solver route is not directly exposed in the UI, scanned-PDF OCR is absent, and no systematic retrieval, generation, privacy, or learning evaluation is present. These limitations should be addressed before interpreting the system as a validated educational product or deploying it with sensitive documents.
+
+The next engineering stage should first clarify and test the multi-PDF and intent-routing behavior, then add a controlled retrieval-and-grounding evaluation, operational privacy controls, and a reproducible build/test environment. Results from those activities can be added to the evaluation record in Appendix~\ref{app:evaluation}; until then, quantitative claims remain intentionally unreported.

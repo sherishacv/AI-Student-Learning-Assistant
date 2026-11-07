@@ -1,0 +1,20 @@
+\chapter{Security, Privacy, and Ethical Considerations}
+\label{ch:security}
+
+\section{Credential handling}
+The Groq key is obtained through environment configuration, and \texttt{.env} is listed in \texttt{.gitignore}. This is a safer configuration pattern than embedding a key in source, but the repository does not show production secret management, key rotation, authorization, or deployment controls.
+
+\section{Document handling and external processing}
+Uploaded PDFs are saved under \texttt{data/uploads}; vector index and metadata are persisted locally. When live generation is configured, retrieved document text is included in a prompt sent through the Groq integration. The repository does not document provider data retention, user consent, a privacy notice, encryption at rest, deletion controls, or access separation. Deployers should disclose external processing and review provider terms before using sensitive course or student material.
+
+\section{Prompt-injection and output controls}
+Shared prompt instructions treat retrieved passages as untrusted reference material, instruct the model not to follow embedded directions, and limit responses to the uploaded material. A phrase-based output sanitizer removes configured strings. These are defense-in-depth intentions, not security proofs: the sanitizer is not a general detector, the tests cover only two phrases, and no adversarial evaluation is supplied. The project README's broader security claims should not be treated as verified guarantees.
+
+\section{Persistence and file safety}
+Metadata is deserialized using Python \texttt{pickle}. The application should only load metadata files from a trusted source; the repository does not implement integrity checks or a safe interchange format. The uploaded file name is used to form a destination path, and there is no explicit filename normalization in \texttt{save\_uploaded\_file}. Deployment review should consider path handling and storage permissions.
+
+\section{Fairness, reliability, and academic use}
+The model's responses may be incomplete, incorrect, or reflect biases in the underlying provider model. Retrieved source/page labels help users inspect supporting material but do not validate each statement. The displayed confidence is a heuristic, not a calibrated probability. Students should verify outputs against original course materials, especially for graded work, formulas, and safety-critical subject matter. No accessibility, bias, or educational-integrity evaluation is present.
+
+\section{Security assessment boundary}
+This chapter is a source-based discussion of design implications, not a penetration test, privacy audit, or formal security review. No claim is made that the application has been independently certified or is appropriate for deployment with confidential data.

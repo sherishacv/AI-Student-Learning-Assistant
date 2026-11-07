@@ -1,0 +1,70 @@
+\chapter{Requirements Analysis}
+\label{ch:requirements}
+
+\section{Functional requirements}
+\begin{longtable}{p{0.12\textwidth}p{0.48\textwidth}p{0.30\textwidth}}
+\caption{Functional requirements and source evidence}\label{tab:functional-requirements}\\
+\toprule
+\textbf{ID} & \textbf{Requirement} & \textbf{Evidence / qualification}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{ID} & \textbf{Requirement} & \textbf{Evidence / qualification}\\
+\midrule
+\endhead
+FR-01 & Upload one or more PDF files in the browser interface. & \texttt{st.file\_uploader}; the indexing loop processes selected files serially.\\
+FR-02 & Extract text and page metadata from PDF pages. & \texttt{extract\_pdf\_text}; empty pages are omitted.\\
+FR-03 & Divide text into overlapping chunks and embed them. & Active splitter uses word counts; default size 1200 and overlap 200.\\
+FR-04 & Retrieve relevant context for a question. & Hybrid retriever uses FAISS distance and keyword overlap.\\
+FR-05 & Generate task-oriented responses. & Six agent functions and six prompt templates exist.\\
+FR-06 & Show response and source-related metadata. & UI displays confidence, duration, sources, pages, relevance, and citation preview.\\
+FR-07 & Retain conversation history during interaction. & History is stored in Streamlit session state; no external history database is configured.\\
+\bottomrule
+\end{longtable}
+
+\section{Non-functional considerations}
+\begin{longtable}{p{0.20\textwidth}p{0.43\textwidth}p{0.27\textwidth}}
+\caption{Non-functional considerations evidenced or left open}\label{tab:nfr}\\
+\toprule
+\textbf{Concern} & \textbf{Observed implementation} & \textbf{Evidence gap}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Concern} & \textbf{Observed implementation} & \textbf{Evidence gap}\\
+\midrule
+\endhead
+Configurability & Model, chunk parameters, top-$k$, and hybrid weight can be set with environment variables. & No validation ranges are specified for every parameter.\\
+Persistence & FAISS index and metadata are written beneath \texttt{vector\_store}. & No backup, migration, or multi-user isolation scheme is included.\\
+Observability & Application log file and UI timing/confidence indicators are present. & No structured trace, monitoring service, or calibrated confidence evaluation.\\
+Security & API key is loaded from environment; \texttt{.env} is ignored by Git. & No authentication or security test suite is present.\\
+Usability & Streamlit provides upload, task selection, query input, and answer display. & No user study or accessibility evaluation is included.\\
+Performance & Resource caching avoids recreating the graph and pipeline on every rerun. & No throughput, memory, or latency benchmark is supplied.\\
+\bottomrule
+\end{longtable}
+
+\section{Software and dependency requirements}
+The dependency declarations in \texttt{requirements.txt} are minimum version constraints, not a locked environment. The repository does not specify a Python version. Table~\ref{tab:dependencies} summarizes the packages and source-backed roles.
+
+\begin{table}[htbp]
+\centering
+\caption{Declared software dependencies}
+\label{tab:dependencies}
+\begin{tabularx}{\textwidth}{p{0.27\textwidth}p{0.18\textwidth}Y}
+\toprule
+\textbf{Package} & \textbf{Minimum} & \textbf{Role in project}\\
+\midrule
+Streamlit & 1.37.0 & Browser-based interface and session state.\\
+LangChain & 0.3.0 & Model integration ecosystem dependency.\\
+LangGraph & 0.2.0 & Stateful graph orchestration.\\
+LangChain-Groq & 0.2.0 & Groq chat-model adapter.\\
+Sentence Transformers & 3.0.0 & Dense text embeddings.\\
+faiss-cpu & 1.8.0 & Local vector index.\\
+pypdf & 4.0.0 & PDF text extraction.\\
+python-dotenv & 1.0.0 & Loading environment values from \texttt{.env}.\\
+NumPy & 1.26.0 & Embedding arrays and numeric conversion.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Hardware and deployment requirements}
+The repository does not specify minimum CPU, RAM, disk, GPU, or network requirements, and it does not contain deployment manifests or a hosted-service configuration. Embedding model loading and external Groq generation have runtime and connectivity implications, but their minimum resource needs are not measured here. These values should be established on the target deployment environment rather than inferred from the source.

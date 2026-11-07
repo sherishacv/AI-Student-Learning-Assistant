@@ -1,0 +1,30 @@
+\chapter{Source and Report File Map}
+\label{app:source-map}
+
+\section{Project files examined}
+\begin{longtable}{p{0.40\textwidth}p{0.49\textwidth}}
+\caption{Key project files and their roles}\label{tab:source-map}\\
+\toprule
+\textbf{Project path} & \textbf{Role in source review}\\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Project path} & \textbf{Role in source review}\\
+\midrule
+\endhead
+\texttt{app.py} & Streamlit entry point and user interaction flow.\\
+\texttt{config.py}, \texttt{.env.example}, \texttt{.gitignore} & Defaults, environment example, and ignored local data.\\
+\texttt{requirements.txt} & Declared dependencies and minimum versions.\\
+\texttt{src/rag/rag\_pipeline.py} & Active orchestration of loading, splitting, embeddings, storage, and retrieval.\\
+\texttt{src/rag/loader.py}, \texttt{src/utils/pdf\_utils.py} & Active PDF text extraction and page metadata.\\
+\texttt{src/rag/splitter.py}, \texttt{src/rag/embeddings.py} & Active chunking and dense encoding.\\
+\texttt{src/rag/retrieval.py}, \texttt{src/rag/vectorstore.py} & Active candidate ranking and FAISS persistence.\\
+\texttt{src/graph/*}, \texttt{src/agents/*}, \texttt{src/prompts/*} & Shared state, intent routing, graph construction, task functions, and prompt templates.\\
+\texttt{src/models/llm.py}, \texttt{src/utils/helpers.py}, \texttt{src/utils/logger.py} & Model adapter, confidence/source formatting, sanitization, and logging.\\
+\texttt{tests/test\_rag.py} & Two smoke-level assertions for splitting and sanitization.\\
+\texttt{README.md} & Project description and run instructions; package claims were cross-checked against source and requirements.\\
+\bottomrule
+\end{longtable}
+
+\section{Report deliverables}
+The Overleaf project consists of \texttt{main.tex}, \texttt{references.bib}, \texttt{chapters/}, \texttt{figures/}, and this \texttt{README.md}. Keep the directory structure intact when uploading the contents of the \texttt{report/} folder.
